@@ -10,14 +10,18 @@ import SwiftUI
 typealias Peg = Color
 
 struct CodeBreaker {
-    var masterCode: Code = Code(kind: .master)
-    var guess: Code = Code(kind: .guess)
+    var masterCode: Code
+    var guess: Code
     var attempts = [Code]()
+    var pegCount: Int = 4
     let pegChoices: [Peg]
     
     init(pegChoices: [Peg] = [.red, .green, .blue, .yellow]) {
+//        self.pegCount = Int.random(in: 3...6)
+        self.masterCode = Code(kind: .master, pegCount: pegCount)
+        self.guess = Code(kind: .guess, pegCount: pegCount)
         self.pegChoices = pegChoices
-        masterCode.randomize(from: pegChoices)
+        masterCode.randomize(from: pegChoices, pegCount: pegCount)
         print(masterCode)
     }
     
@@ -40,13 +44,13 @@ struct CodeBreaker {
     }
     
     mutating func resetGame() {
+        let randomPegCount = Int.random(in: 3...6)
         // Clear previous attempts
         self.attempts = []
         // Generate new masterCode
-        masterCode.randomize(from: pegChoices)
+        masterCode.randomize(from: pegChoices, pegCount: randomPegCount)
         // Reset guess to clear
-//        guess = Code(kind: .guess)
-        guess = Code(kind: .guess, pegCount: 4)
+        guess = Code(kind: .guess, pegCount: randomPegCount)
         
     }
 }
@@ -71,8 +75,10 @@ struct Code: Equatable {
         case unknown
     }
     
-    mutating func randomize(from pegChoices: [Peg]) {
-        for index in pegChoices.indices {
+    mutating func randomize(from pegChoices: [Peg], pegCount: Int) {
+//        for index in pegChoices.indices {
+        pegs = Array(repeating: Code.missing, count: pegCount)
+        for index in 0..<pegCount {
             pegs[index] = pegChoices.randomElement() ?? Code.missing
         }
     }
